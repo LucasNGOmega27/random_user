@@ -13,58 +13,43 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  Results results = Results();
+  List<Results>? results;
   UserModel userModel = UserModel();
+  ApiService apiService = getIt<ApiService>();
+  Map<String, dynamic>? viewData;
+  @override
+  void initState() {
+    super.initState();
+    apiService.getRandomUsers().then((value) {
+      results = apiService.users;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<HomeViewModel>.reactive(
-        viewModelBuilder: () => HomeViewModel(),
-        builder: (context, model, child) => Scaffold(
-              appBar: AppBar(
-                title: const Text("List of Random Users"),
-                centerTitle: true,
+      viewModelBuilder: () => HomeViewModel(),
+      builder: (context, model, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text("List of Random Users"),
+          centerTitle: true,
+        ),
+        body: ListView.builder(
+          itemCount: results?.length,
+          itemBuilder: (context, index) => ListTile(
+            leading: Hero(
+              tag: "image$index",
+              child: CircleAvatar(
+                backgroundImage:
+                    NetworkImage(results![index].picture.toString()),
               ),
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                        // children: [_buildCategoryList()],
-                        ),
-                  ],
-                ),
+            ),
+            title: Text(
+              results![index].name.toString(),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
-            ));
-  }
-
-  ClipRRect _buildCategoryList() {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-      child: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: FutureBuilder<List<Results>?>(
-            future: getIt<ApiService>().getRandomUsers(),
-            builder: (context, snapshot) => !snapshot.hasData
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (context, snapshot) => ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(results.picture!.toString()),
-                      ),
-                      title: Text(
-                        results.name.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+            ),
           ),
         ),
       ),
