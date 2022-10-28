@@ -1,0 +1,1 @@
+enum UserDataEnum { loading, dataReady }

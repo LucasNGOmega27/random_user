@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:random_user/app/locator.dart';
 import 'package:random_user/app/routes.dart';
 import 'package:random_user/shared/simple_alert/simple_alert.dart';
@@ -69,9 +70,15 @@ class _BootstrapViewState extends State<BootstrapView> {
                   width: MediaQuery.of(context).size.width * 0.2,
                   height: MediaQuery.of(context).size.height * 0.1,
                   padding: const EdgeInsets.all(8.0),
-                  child: const CircularProgressIndicator(
-                    color: Colors.blue,
-                  ),
+                  child: LiquidCircularProgressIndicator(
+                      value: 0.25,
+                      // ignore: prefer_const_constructors
+                      valueColor: AlwaysStoppedAnimation(Colors.blueAccent),
+                      backgroundColor: Colors.white,
+                      borderColor: Colors.red,
+                      borderWidth: 5.0,
+                      direction: Axis.horizontal,
+                      center: Text("Loading...")),
                 ),
               ],
             ),
