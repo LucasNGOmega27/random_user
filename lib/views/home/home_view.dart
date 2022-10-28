@@ -13,6 +13,8 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  Results results = Results();
+  UserModel userModel = UserModel();
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<HomeViewModel>.reactive(
@@ -26,9 +28,8 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   children: [
                     Row(
-                      children: [],
-                    ),
-                    insertButton(model.pullNewUserFromApi(context)),
+                        // children: [_buildCategoryList()],
+                        ),
                   ],
                 ),
               ),
@@ -43,54 +44,29 @@ class _HomeViewState extends State<HomeView> {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(14.0),
-          child: StreamBuilder<List<UserModel>>(
-            stream: getIt<ApiService>().getRandomUsers(),
+          child: FutureBuilder<List<Results>?>(
+            future: getIt<ApiService>().getRandomUsers(),
             builder: (context, snapshot) => !snapshot.hasData
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : ListView.builder(
                     itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (context, index) => ListTile(
-                      contentPadding:
-                          const EdgeInsets.only(left: 15.0, bottom: 15),
-                      dense: true,
-                      leading: _userImage(snapshot, index),
-                      title: _userName(snapshot, index),
+                    itemBuilder: (context, snapshot) => ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(results.picture!.toString()),
+                      ),
+                      title: Text(
+                        results.name.toString(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
           ),
         ),
-      ),
-    );
-  }
-
-  Text _userName(AsyncSnapshot<List<Results>> snapshot, int index) {
-    return Text(
-      snapshot.data![index].name.toString(),
-      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-    );
-  }
-
-  CircleAvatar _userImage(AsyncSnapshot<List<Picture>> snapshot, int index) {
-    return CircleAvatar(
-        foregroundColor: Colors.white,
-        child: Image.network(snapshot.data![index].medium.toString()));
-  }
-
-  Widget _filterUsers() {
-    return Container();
-  }
-
-  Widget insertButton(void onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red.shade900,
-      ),
-      onPressed: () async => onPressed,
-      child: const Icon(
-        Icons.add,
-        color: Colors.white70,
       ),
     );
   }

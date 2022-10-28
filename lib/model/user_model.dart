@@ -135,7 +135,7 @@ class Location {
   String? city;
   String? state;
   String? country;
-  int? postcode;
+  String? postcode;
   Coordinates? coordinates;
   Timezone? timezone;
 
@@ -153,7 +153,7 @@ class Location {
     city = json['city'];
     state = json['state'];
     country = json['country'];
-    postcode = json['postcode'];
+    postcode = json['postcode'].toString();
     coordinates = json['coordinates'] != null
         ? Coordinates.fromJson(json['coordinates'])
         : null;

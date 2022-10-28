@@ -13,29 +13,25 @@ class ApiService {
   final Config _config = getIt<Config>();
   bool isSuccess(http.Response response) =>
       response.statusCode == 200 || response.statusCode == 201;
-  Map<String, dynamic>? responseJson;
-
+  List<Results>? users = [];
+  var responseJson;
   Map<String, String> get authRequestHeader => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
 
   handleApiError(error) => log(error, time: DateTime.now());
-
-  Stream<List<UserModel>> getRandomUsers() {
-    List<UserModel> categories = [];
-    http
-        .get(Uri.parse('${_config.apiBaseUrl}'), headers: authRequestHeader)
+  
+  Future<List<Results>?> getRandomUsers() async {
+    final response = await http
+        .get(Uri.parse('${_config.apiBaseUrl}'))
         .catchError((error) => handleApiError(error))
-        .then((response) {
-      if (isSuccess(response)) {
-        final responseDecode = jsonDecode(response.body);
-        categories.addAll(
-          responseDecode.map((item) => UserModel.fromJson(item)).toList(),
-        );
-      }
-    });
-
-    return Stream.value(categories);
+        .timeout(const Duration(seconds: 30));
+    if (isSuccess(response)) {
+      responseJson = json.decode(response.body);
+      UserModel userModel = UserModel.fromJson(responseJson);
+      users = userModel.results;
+    }
+    return users;
   }
 }
